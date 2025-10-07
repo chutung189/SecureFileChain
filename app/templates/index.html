@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<style type="text/css">
+  .navbar-item:hover {
+    background-color: #b9293c;
+  }
+
+  .title {
+    margin-top: 5rem;
+    text-align: center;
+    line-height: 1.6rem;
+  }
+
+  .title-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 3rem;
+  }
+
+  .subtitle-text {
+    font-size: 1.6rem;
+    color: #666;
+  }
+
+  .post_box {
+    background: rgb(240, 253, 255);
+    padding: 1.2rem;
+    margin-top: 1rem;
+    border: 1px solid #b0bec5;
+    border-radius: 0.4rem;
+  }
+
+  .post_box-header {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .post_box-body {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1.5;
+  }
+
+  .btn:hover {
+    background-color: #b92948;
+    cursor: pointer;
+  }
+
+  .form-control {
+    font-size: 1.2rem;
+  }
+
+  .alert-primary {
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+  }
+
+  a {
+    color: #1e88e5;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="row" style="padding-top: 10px">
+    
+    <!-- Cột upload -->
+    <div class="col-sm-4">
+      <h2 class="text-center alert alert-primary">Tải File lên Blockchain & IPFS</h2>
+      <form action="/upload" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="file">Chọn file cần tải:</label>
+          <input type="file" class="form-control" id="file" name="file" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mật khẩu mã hóa:</label>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            name="password"
+            placeholder="Nhập mật khẩu"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-2">Upload</button>
+      </form>
+    </div>
+
+    <!-- Cột danh sách file -->
+    <div class="col-sm-7">
+      <h2 class="text-center alert alert-primary">Danh sách file trên Blockchain</h2>
+
+      {% if blocks|length > 1 %}
+        {% for block in blocks[1:] %}  {# Bỏ qua genesis block #}
+        <div class="post_box">
+          <div class="post_box-header">
+            📁 {{ block.data.filename }}
+          </div>
+          <div class="post_box-body">
+            <p><b>CID:</b> {{ block.data.CID }}</p>
+            <p><b>SHA256:</b> {{ block.data.file_hash }}</p>
+            <a href="/verify/{{ block.data.CID }}">🔍 Kiểm tra toàn vẹn</a>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p>Chưa có file nào được tải lên.</p>
+      {% endif %}
+    </div>
+
+    <div class="col-sm-1"></div>
+  </div>
+</div>
+
+{% endblock %}

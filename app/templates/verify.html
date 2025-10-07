@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Kết quả kiểm tra file CID: <code>{{ cid }}</code></h2>
+
+  {% if valid %}
+    <div class="alert alert-success text-center">
+      ✅ File hợp lệ - không bị sửa đổi
+    </div>
+  {% else %}
+    <div class="alert alert-danger text-center">
+      ❌ File bị thay đổi hoặc sai hash
+    </div>
+  {% endif %}
+
+  <div class="text-center mt-4">
+    <a href="/" class="btn btn-primary">⬅ Quay lại trang chính</a>
+  </div>
+</div>
+{% endblock %}
