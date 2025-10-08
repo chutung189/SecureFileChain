@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, send_file
 import os, hashlib
 from Blockchain import Blockchain
 from Block import Block
@@ -20,6 +20,7 @@ def index():
 def upload():
     file = request.files['file']
     password = request.form['password']
+    username = request.form['username']
     key = generate_key(password)
 
     path = os.path.join(UPLOAD_FOLDER, file.filename)
@@ -34,7 +35,8 @@ def upload():
     data = {
         "filename": file.filename,
         "CID": cid,
-        "file_hash": file_hash
+        "file_hash": file_hash,
+        "username": username
     }
     blockchain.mine(data)
     return redirect(url_for('index'))
@@ -53,6 +55,23 @@ def verify(cid):
             return render_template('verify.html', cid=cid, valid=valid)
 
     return "CID not found!"
+
+@app.route('/download/<cid>')
+def download(cid):
+    block = next((b for b in blockchain.chain if b.data.get("CID") == cid), None)
+    filename = block.data["filename"] if block else f"{cid}.download"
+    output_path = os.path.join(UPLOAD_FOLDER, f"{cid}.download")
+    local_path = download_from_ipfs(cid, output_path)
+    # Nếu là thư mục, lấy file bên trong
+    if os.path.isdir(local_path):
+        files = os.listdir(local_path)
+        if files:
+            local_path = os.path.join(local_path, files[0])
+        else:
+            return "Không tìm thấy file trong thư mục tải về.", 404
+    if not os.path.exists(local_path):
+        return "Không tìm thấy hoặc tải file từ IPFS thất bại.", 404
+    return send_file(local_path, as_attachment=True, download_name=filename)
 
 if __name__ == '__main__':
     app.run(host='localhost', port=9000, debug=True)
