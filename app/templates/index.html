@@ -97,19 +97,17 @@
     <!-- Cột danh sách file -->
     <div class="col-sm-7">
       <h2 class="text-center alert alert-primary">Danh sách file trên Blockchain</h2>
-
       {% if blocks|length > 1 %}
-        {% for block in blocks[1:] %}  {# Bỏ qua genesis block #}
-        <div class="post_box">
-          <div class="post_box-header">
-            📁 {{ block.data.filename }}
+        {% for block in blocks[1:] %}
+          <div class="post_box">
+            <div class="post_box-header">
+              {{ block.data.filename }}
+            </div>
+            <div class="post_box-body">
+              CID: <code>{{ block.data.CID }}</code><br>
+              SHA256: <code>{{ block.data.file_hash }}</code>
+            </div>
           </div>
-          <div class="post_box-body">
-            <p><b>CID:</b> {{ block.data.CID }}</p>
-            <p><b>SHA256:</b> {{ block.data.file_hash }}</p>
-            <a href="/verify/{{ block.data.CID }}">🔍 Kiểm tra toàn vẹn</a>
-          </div>
-        </div>
         {% endfor %}
       {% else %}
         <p>Chưa có file nào được tải lên.</p>

@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 import os, hashlib
-from blockchain import Blockchain
+from Blockchain import Blockchain
 from Block import Block
 from encryption import encrypt_file, decrypt_file, generate_key
 from ipfs_helper import upload_to_ipfs, download_from_ipfs
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='app/templates')
 blockchain = Blockchain()
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -36,22 +36,8 @@ def upload():
         "CID": cid,
         "file_hash": file_hash
     }
-
-    # Tạo block mới và thêm vào blockchain
-    new_block = Block(
-        index=len(blockchain.chain),
-        timestamp="2025-10-04 00:00:00",
-        data=data,
-        previous_hash=blockchain.last_block().hash
-    )
-
-    blockchain.add_block(new_block)
-
-    return f"""
-    <h3>File uploaded successfully!</h3>
-    <p><b>CID:</b> {cid}</p>
-    <p><b>SHA256:</b> {file_hash}</p>
-    """
+    blockchain.mine(data)
+    return redirect(url_for('index'))
 
 # Xác minh file bằng CID
 @app.route('/verify/<cid>', methods=['GET'])
